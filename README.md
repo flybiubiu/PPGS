@@ -2,7 +2,7 @@
 
 [data](https://drive.google.com/drive/folders/1Ls5o_WuqxPG6jAxMKTG_F4p8XvJ-kA-P) | [checkpoints](https://drive.google.com/drive/folders/1Ls5o_WuqxPG6jAxMKTG_F4p8XvJ-kA-P)  <br>
 
-![Teaser image](assets/fig.jpg)
+![Teaser image](assets/fig.png)
 
 This repo contains the official implementation for the paper "2D Gaussian Splatting for Geometrically Accurate Radiance Fields". Our work represents a scene with a set of 2D oriented disks (surface elements) and rasterizes the surfels with [perspective correct differentiable raseterization](https://colab.research.google.com/drive/1qoclD7HJ3-o0O1R8cvV3PxLhoDCMsH8W?usp=sharing). Our work also develops regularizations that enhance the reconstruction quality. We also devise meshing approaches for Gaussian splatting.
 
