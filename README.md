@@ -31,14 +31,7 @@ cd submodules/segment-anything-langsplat/ && python -m pip install -e . && cd ..
 
 ## Preproccessing
 
-We extract dense CLIP features and Dino featrues from multi-view images and concatenate them as the dense features. Then, we quantize them and save the feature indices (`xxx_encoding_indices.pt`) and codebook (`xxx_codebook.pt`) in the image root directory for training and evaluation. You can run the following command to preprocess the images. 
- 
-```bash
-cd preprocess
-python quantize_features.py --config configs/mipnerf360/xxx.cfg
-```
-
-The `xxx.cfg` is the config file for the specific scene. You can find the config files in the `./preprocess/configs/mipnerf360` directory. The `--config` argument specifies the config file you want to use. You can modify the config file to preprocess the features for other scenes or dataset.
+We follow the preprocessing pipeline of LangSplat; however, since most existing methods focus on understanding performance, we do not distinguish between training and test splits.
 
 ## Training
 
