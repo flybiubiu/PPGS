@@ -7,170 +7,138 @@
 This repo contains the official implementation for the paper "2D Gaussian Splatting for Geometrically Accurate Radiance Fields". Our work represents a scene with a set of 2D oriented disks (surface elements) and rasterizes the surfels with [perspective correct differentiable raseterization](https://colab.research.google.com/drive/1qoclD7HJ3-o0O1R8cvV3PxLhoDCMsH8W?usp=sharing). Our work also develops regularizations that enhance the reconstruction quality. We also devise meshing approaches for Gaussian splatting.
 
 
-## ⭐ New Features 
-- 2024/06/10: [SIBR Viewer](https://github.com/RongLiu-Leo/2d-gaussian-splatting) is supported!
-- 2024/06/05: [Remote Viewer](https://github.com/hwanhuh/2D-GS-Viser-Viewer) based on Viser is supported! Thanks to [HwanHeo](https://github.com/hwanhuh).
-- 2024/05/30:  Fixed a bug related to unbounded meshing. The foreground mesh quality should now be consistent with the bounded mesh.
-- 2024/05/17: Improve training speed by 30%~40% through the [cuda operator fusing](https://github.com/hbb1/diff-surfel-rasterization/pull/7). Please update the diff-surfel-rasterization submodule if you have already installed it. 
-    ```bash
-    git submodule update --remote  
-    pip install submodules/diff-surfel-rasterization
-    ```
-- 2024/05/05: Important updates - Now our algorithm supports **unbounded mesh extraction**!
-Our key idea is to contract the space into a sphere and then perform **adaptive TSDF truncation**. 
+</div>
 
-![visualization](assets/unbounded.gif)
+***Abstract**: Open-vocabulary querying in 3D space is challenging but essential for scene understanding tasks such as object localization and segmentation. Language-embedded scene representations have made progress by incorporating language features into 3D spaces. However, their efficacy heavily depends on neural networks that are resource-intensive in training and rendering. Although recent 3D Gaussians offer efficient and high-quality novel view synthesis, directly embedding language features in them leads to prohibitive memory usage and decreased performance. In this work, we introduce **Language Embedded 3D Gaussians**, a novel scene representation for open-vocabulary query tasks. Instead of embedding high-dimensional raw semantic features on 3D Gaussians, we propose a dedicated quantization scheme that drastically alleviates the memory requirement, and a novel embedding procedure that achieves smoother yet high accuracy query, countering the multi-view feature inconsistencies and the high-frequency inductive bias in point-based representations. Our comprehensive experiments show that our representation achieves the best visual quality and language querying accuracy across current language-embedded representations, while maintaining real-time rendering frame rates on a single desktop GPU.*
 
-## SIBR Viewer
+<details span>
+<summary><b>Update Log:</b></summary>
+<br>
 
+**April 7, 2024**: 
+* Initial release of the LEGaussians repository.
 
-https://github.com/RongLiu-Leo/2d-gaussian-splatting/assets/102014841/b75dd9a7-e3ee-4666-99ff-8c9121ff66dc
+</details>
+
+<br>
 
 
-The Pre-built Viewer for Windows can be found [here](https://drive.google.com/file/d/1DRFrtFUfz27QvQKOWbYXbRS2o2eSgaUT/view?usp=sharing). If you use Ubuntu or want to check the viewer usage, please refer to [GS Monitor](https://github.com/RongLiu-Leo/Gaussian-Splatting-Monitor).
-### How to use
-Firstly open the viewer, 
-```shell
-<path to downloaded/compiled viewer>/bin/SIBR_remoteGaussian_app_rwdi
-```
-and then
-```shell
-# Monitor the training process
-python train.py -s <path to COLMAP or NeRF Synthetic dataset> 
-# View the trained model
-python view.py -s <path to COLMAP or NeRF Synthetic dataset> -m <path to trained model> 
-```
-
-## Installation
+## Setup
 
 ```bash
-# download
-git clone https://github.com/hbb1/2d-gaussian-splatting.git --recursive
+git clone https://github.com/buaavrcg/LEGaussians.git --recursive
+cd LEGaussians
 
-# if you have an environment used for 3dgs, use it
-# if not, create a new environment
-conda env create --file environment.yml
-conda activate surfel_splatting
+conda create -n legaussians python=3.8 -y
+conda activate legaussians
+
+pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
+
+pip install tqdm plyfile timm open_clip_torch scipy six configargparse pysocks python-dateutil imageio seaborn opencv-python scikit-learn tensorboard Pillow==9.5.0
+
+# Install local packages from the 'submodules' directory
+# a modified gaussian splatting (+ semantic features rendering)
+cd submodules/diff-gaussian-rasterization/ && python -m pip install -e . && cd ../..
+# simple-knn
+cd submodules/simple-knn/ && python -m pip install -e . && cd ../..
 ```
+
+## Dataset
+
+Please download the dataset from [the link](https://drive.google.com/drive/folders/1vJ3le9lIGq8zl3ls1OzkBQ-rXLiSSc22?usp=drive_link) and put it in the `./data` directory. The dataset contains six scenes (excluding the Stump) from the [Mip-NeRF 360 dataset](https://jonbarron.info/mipnerf360/) and five scenes (waldo kitchen, bouquet, ramen, teatime and figurines) from the [LeRF dataset](https://www.lerf.io/). Segmentation masks are only provided for the evaluation set. 
+You can put the dataset anywhere you want, but you need to modify the `source_path` or `image_dir` in the config files.
+
+## Preproccessing
+
+We extract dense CLIP features and Dino featrues from multi-view images and concatenate them as the dense features. Then, we quantize them and save the feature indices (`xxx_encoding_indices.pt`) and codebook (`xxx_codebook.pt`) in the image root directory for training and evaluation. You can run the following command to preprocess the images. 
+ 
+```bash
+cd preprocess
+python quantize_features.py --config configs/mipnerf360/xxx.cfg
+```
+
+The `xxx.cfg` is the config file for the specific scene. You can find the config files in the `./preprocess/configs/mipnerf360` directory. The `--config` argument specifies the config file you want to use. You can modify the config file to preprocess the features for other scenes or dataset.
+
 ## Training
-To train a scene, simply use
+
+We use the `train.py` script to train the model. The config file specifies data and output paths, training hyperparameters, test set, and language feature indices path. The configs for the Mip-NeRF 360 dataset are in the `./configs/mipnerf360` directory. 
+
 ```bash
-python train.py -s <path to COLMAP or NeRF Synthetic dataset>
+python train.py --config configs/mipnerf360/xxx.cfg
 ```
-Commandline arguments for regularizations
+
+You can modify the config file to train the model for other scenes or dataset.
+
+## Rendering
+
+We use the `render_mask.py` script to render rgbs, relevancy maps of text queries, and segmentation masks. The config file specifies the paths, queried texts, test set, rendering parameters and so on. The rendering configs for the Mip-NeRF 360 dataset are in the `./configs/mipnerf360-rendering` directory.
+
 ```bash
---lambda_normal  # hyperparameter for normal consistency
---lambda_distortion # hyperparameter for depth distortion
---depth_ratio # 0 for mean depth and 1 for median depth, 0 works for most cases
+python render_mask.py --config configs/mipnerf360-rendering/xxx.cfg
 ```
-**Tips for adjusting the parameters on your own dataset:**
-- For unbounded/large scenes, we suggest using mean depth, i.e., ``depth_ratio=0``,  for less "disk-aliasing" artifacts.
 
-## Testing
-### Bounded Mesh Extraction
-To export a mesh within a bounded volume, simply use
+Because the load of pretained model could be slow, you can modify the `train.py` to render the scene right after training. 
+
+The output will be saved in the root directory of the checkpoint file, and it is orgniazed as follows:
 ```bash
-python render.py -m <path to pre-trained model> -s <path to COLMAP dataset> 
+eval_xxx/
+├── gt_images
+│   ├── frame_00039.png
+│   ├── frame_00059.png
+│   ...
+├── pred_images
+│   ├── frame_00039.png
+│   ├── frame_00059.png
+│   ...
+├── pred_segs
+│   ├── frame_00039
+│   │   ├── big white crinkly flower.png
+│   │   ├── bouquet.png
+│   │   ...
+│   │   ├── distr
+│   │   │   ├── big white crinkly flower.png
+│   │   │   ├── bouquet.png
+│   │   │   ...
+│   ...
+│   └── texts_dict.json
+├── relevancy
+│   ├── frame_00039
+│   │   ├── array
+│   │   │   ├── big white crinkly flower.npy
+│   │   │   ├── bouquet.npy
+│   │   │   ...
+│   │   └── images
+│   │       ├── big white crinkly flower.png
+│   │       ├── bouquet.png
+│   │       ...
+│   ...
 ```
-Commandline arguments you should adjust accordingly for meshing for bounded TSDF fusion, use
+
+## Evaluation
+
+We use the `eval.py` script to evaluate the rendering results. Now, we need copy the segmentation masks from the dataset to the output directory and run the following command to evaluate the rendering results. In the future, we will optimize the evaluation process. The path is the output directory of the rendering results.
+
 ```bash
---depth_ratio # 0 for mean depth and 1 for median depth
---voxel_size # voxel size
---depth_trunc # depth truncation
-```
-If these arguments are not specified, the script will automatically estimate them using the camera information.
-### Unbounded Mesh Extraction
-To export a mesh with an arbitrary size, we devised an unbounded TSDF fusion with space contraction and adaptive truncation.
-```bash
-python render.py -m <path to pre-trained model> -s <path to COLMAP dataset> --mesh_res 1024
+cp -r data/xxx/segmentations output/eval_xxx
+python eval.py --path output/eval_xxx
 ```
 
-### Quick Examples
-Assuming you have downloaded [MipNeRF360](https://jonbarron.info/mipnerf360/), simply use
-```bash
-python train.py -s <path to m360>/<garden> -m output/m360/garden
-# use our unbounded mesh extraction!!
-python render.py -s <path to m360>/<garden> -m output/m360/garden --unbounded --skip_test --skip_train --mesh_res 1024
-# or use the bounded mesh extraction if you focus on foreground
-python render.py -s <path to m360>/<garden> -m output/m360/garden --skip_test --skip_train --mesh_res 1024
-```
-If you have downloaded the [DTU dataset](https://drive.google.com/drive/folders/1SJFgt8qhQomHX55Q4xSvYE2C6-8tFll9), you can use
-```bash
-python train.py -s <path to dtu>/<scan105> -m output/date/scan105 -r 2 --depth_ratio 1
-python render.py -r 2 --depth_ratio 1 --skip_test --skip_train
-```
-**Custom Dataset**: We use the same COLMAP loader as 3DGS, you can prepare your data following [here](https://github.com/graphdeco-inria/gaussian-splatting?tab=readme-ov-file#processing-your-own-scenes). 
+After evaluation, you can get the visual quality and language querying accuracy of the rendering results. And detailed results of language metrics will be saved in the `lem_metrics.json` and `mAP_metrics.json` in the output directory.
 
-## Full evaluation
-We provide scripts to evaluate our method of novel view synthesis and geometric reconstruction.
-<details>
-<summary><span style="font-weight: bold;">Explanation of Performance Differences to the Paper</span></summary>
+## TODO List
 
-We have re-implemented the repository for improved efficiency, which has slightly impacted performance compared to the original paper. Two factors have influenced this change:
+The repository is currently under construction. We appreciate your patience. Here's the TODO list:
+- [ ] Add quantization visualization scripts.
+- [ ] Add relevancy maps of text queries visualization scripts.
+- [ ] Add LeRF config files.
+- [ ] Upload pretrained models.
+  
+And if you have any questions or suggestions, please feel free to open an issue or a pull request. We are happy to help you.
 
-- 📈 We fixed some minor bugs, such as a half-pixel shift in TSDF fusion, resulting in improved geometry reconstruction.
+## Acknowledgement
 
-- 📉 We removed the gradient of the low-pass filter used for densification, which reduces the number of Gaussians. As a result, the PSNR has slightly dropped, but we believe this trade-off is worthwhile for real-world applications.
-
-You can report either the numbers from the paper or from this implementation, as long as they are discussed in a comparable setting.
-</details>
-
-#### Novel View Synthesis
-For novel view synthesis on [MipNeRF360](https://jonbarron.info/mipnerf360/) (which also works for other colmap datasets), use
-```bash
-python scripts/mipnerf_eval.py -m60 <path to the MipNeRF360 dataset>
-```
-We provide <a> Evaluation Results (Pretrained, Images)</a>. 
-<details>
-<summary><span style="font-weight: bold;">Table Results</span></summary>
-
-</details>
-
-#### Geometry reconstruction
-For geometry reconstruction on DTU dataset, please download the preprocessed [data](https://drive.google.com/drive/folders/1SJFgt8qhQomHX55Q4xSvYE2C6-8tFll9). You also need to download the ground truth [DTU point cloud](https://roboimagedata.compute.dtu.dk/?page_id=36). 
-```bash
-python scripts/dtu_eval.py --dtu <path to the preprocessed DTU dataset>   \
-     --DTU_Official <path to the official DTU dataset>
-```
-We provide <a> Evaluation Results (Pretrained, Meshes)</a>. 
-<details>
-<summary><span style="font-weight: bold;">Table Results</span></summary>
-
-Chamfer distance on DTU dataset (lower is better)
-
-|   | 24   | 37   | 40   | 55   | 63   | 65   | 69   | 83   | 97   | 105  | 106  | 110  | 114  | 118  | 122  | Mean |
-|----------|------|------|------|------|------|------|------|------|------|------|------|------|------|------|------|------|
-| Paper    | 0.48 | 0.91 | 0.39 | 0.39 | 1.01 | 0.83 | 0.81 | 1.36 | 1.27 | 0.76 | 0.70 | 1.40 | 0.40 | 0.76 | 0.52 | 0.80 |
-| Reproduce | 0.46 | 0.80 | 0.33 | 0.37 | 0.95 | 0.86 | 0.80 | 1.25 | 1.24 | 0.67 | 0.67 | 1.24 | 0.39 | 0.64 | 0.47 | 0.74 |
-</details>
-<br>
-
-For geometry reconstruction on TnT dataset, please download the preprocessed [TnT_data](https://huggingface.co/datasets/ZehaoYu/gaussian-opacity-fields/tree/main). You also need to download the ground truth [TnT_GT](https://www.tanksandtemples.org/download/), including ground truth point cloud, alignments and cropfiles.
-```bash
-python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset>   \
-     --TNT_GT <path to the official TNT evaluation dataset>
-```
-We provide <a> Evaluation Results (Pretrained, Meshes)</a>. 
-<details>
-<summary><span style="font-weight: bold;">Table Results</span></summary>
-
-F1 scores on TnT dataset (higher is better)
-
-|    | Barn   | Caterpillar | Ignatius | Truck  | Meetingroom | Courthouse | Mean | 
-|--------|--------|-------------|----------|--------|-------------|------------|------------|
-| Reproduce | 0.41  | 0.23      | 0.51   | 0.45 | 0.17      | 0.15      | 0.32 |
-</details>
-<br>
-
-
-## FAQ
-- **Training does not converge.**  If your camera's principal point does not lie at the image center, you may experience convergence issues. Our code only supports the ideal pinhole camera format, so you may need to make some modifications. Please follow the instructions provided [here](https://github.com/graphdeco-inria/gaussian-splatting/issues/144#issuecomment-1938504456) to make the necessary changes. We have also modified the rasterizer in the latest [commit](https://github.com/hbb1/diff-surfel-rasterization/pull/6) to support data accepted by 3DGS. To avoid further issues, please update to the latest commit.
-
-- **No mesh / Broken mesh.** When using the *Bounded mesh extraction* mode, it is necessary to adjust the `depth_trunc` parameter to perform TSDF fusion to extract meshes. On the other hand, *Unbounded mesh extraction* does not require tuning the parameters but is less efficient.  
-
-- **Can 3DGS's viewer be used to visualize 2DGS?** Technically, you can export 2DGS to 3DGS's ply file by appending an additional zero scale. However, due to the inaccurate affine projection of 3DGS's viewer, you may see some distorted artefacts. We are currently working on a viewer for 2DGS, so stay tuned for updates.
-
-## Acknowledgements
-This project is built upon [3DGS](https://github.com/graphdeco-inria/gaussian-splatting). The TSDF fusion for extracting mesh is based on [Open3D](https://github.com/isl-org/Open3D). The rendering script for MipNeRF360 is adopted from [Multinerf](https://github.com/google-research/multinerf/), while the evaluation scripts for DTU and Tanks and Temples dataset are taken from [DTUeval-python](https://github.com/jzhangbs/DTUeval-python) and [TanksAndTemples](https://github.com/isl-org/TanksAndTemples/tree/master/python_toolbox/evaluation), respectively. The fusing operation for accelerating the renderer is inspired by [Han's repodcue](https://github.com/Han230104/2D-Gaussian-Splatting-Reproduce). We thank all the authors for their great repos. 
-
-```
+Credits to the authors for their excellent contributions in the following works:
+- [3D Gaussians](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/)
+- [LeRF](https://www.lerf.io/)
+- [VQ-VAE](https://arxiv.org/abs/1711.00937)
+- [dino-vit-features](https://dino-vit-features.github.io/)
