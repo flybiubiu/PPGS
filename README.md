@@ -59,39 +59,7 @@ python render_mask.py --config configs/mipnerf360-rendering/xxx.cfg
 Because the load of pretained model could be slow, you can modify the `train.py` to render the scene right after training. 
 
 The output will be saved in the root directory of the checkpoint file, and it is orgniazed as follows:
-```bash
-eval_xxx/
-├── gt_images
-│   ├── frame_00039.png
-│   ├── frame_00059.png
-│   ...
-├── pred_images
-│   ├── frame_00039.png
-│   ├── frame_00059.png
-│   ...
-├── pred_segs
-│   ├── frame_00039
-│   │   ├── big white crinkly flower.png
-│   │   ├── bouquet.png
-│   │   ...
-│   │   ├── distr
-│   │   │   ├── big white crinkly flower.png
-│   │   │   ├── bouquet.png
-│   │   │   ...
-│   ...
-│   └── texts_dict.json
-├── relevancy
-│   ├── frame_00039
-│   │   ├── array
-│   │   │   ├── big white crinkly flower.npy
-│   │   │   ├── bouquet.npy
-│   │   │   ...
-│   │   └── images
-│   │       ├── big white crinkly flower.png
-│   │       ├── bouquet.png
-│   │       ...
-│   ...
-```
+
 
 ## Evaluation
 
