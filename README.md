@@ -12,10 +12,10 @@
 git clone https://github.com/flybiubiu/PPGS.git --recursive
 cd PPGS
 
-conda create -n ppgs python=3.8 -y
+conda create -n ppgs python=3.9 -y
 conda activate ppgs
 
-pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124
 
 pip install tqdm plyfile timm open_clip_torch scipy six configargparse pysocks python-dateutil imageio seaborn opencv-python scikit-learn tensorboard Pillow==9.5.0
 
