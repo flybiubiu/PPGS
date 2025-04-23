@@ -24,6 +24,8 @@ pip install tqdm plyfile timm open_clip_torch scipy six configargparse pysocks p
 cd submodules/diff-gaussian-rasterization/ && python -m pip install -e . && cd ../..
 # simple-knn
 cd submodules/simple-knn/ && python -m pip install -e . && cd ../..
+# segment-anything-langsplat
+cd submodules/segment-anything-langsplat/ && python -m pip install -e . && cd ../..
 ```
 
 
