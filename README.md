@@ -139,6 +139,5 @@ And if you have any questions or suggestions, please feel free to open an issue 
 
 Credits to the authors for their excellent contributions in the following works:
 - [3D Gaussians](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/)
-- [LeRF](https://www.lerf.io/)
-- [VQ-VAE](https://arxiv.org/abs/1711.00937)
-- [dino-vit-features](https://dino-vit-features.github.io/)
+- [2D Gaussians](https://surfsplatting.github.io/)
+- [LEGaussians](https://arxiv.org/pdf/2311.18482)
