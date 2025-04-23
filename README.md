@@ -67,16 +67,6 @@ python eval.py --path output/eval_xxx
 
 After evaluation, you can get the visual quality and language querying accuracy of the rendering results. And detailed results of language metrics will be saved in the `lem_metrics.json` and `mAP_metrics.json` in the output directory.
 
-## TODO List
-
-The repository is currently under construction. We appreciate your patience. Here's the TODO list:
-- [ ] Add quantization visualization scripts.
-- [ ] Add relevancy maps of text queries visualization scripts.
-- [ ] Add LeRF config files.
-- [ ] Upload pretrained models.
-  
-And if you have any questions or suggestions, please feel free to open an issue or a pull request. We are happy to help you.
-
 ## Acknowledgement
 
 Credits to the authors for their excellent contributions in the following works:
