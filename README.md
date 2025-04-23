@@ -57,6 +57,7 @@ The output will be saved in the root directory of the checkpoint file, and it is
 
 
 ## Evaluation
+![Eval image](assets/eval.png)
 
 We use the `eval.py` script to evaluate the rendering results. Now, we need copy the segmentation masks from the dataset to the output directory and run the following command to evaluate the rendering results. In the future, we will optimize the evaluation process. The path is the output directory of the rendering results.
 
