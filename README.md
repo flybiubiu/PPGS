@@ -59,7 +59,7 @@ The output will be saved in the root directory of the checkpoint file, and it is
 ## Evaluation
 Evaluation results on the Bonsai dataset.
 ![Eval image](assets/eval.png)
-
+After downloading the checkpoints, place best_ckpt.pth in the ckpt directory of the autoencoder, and then proceed with the evaluation process.
 We use the `eval.py` script to evaluate the rendering results. Now, we need copy the segmentation masks from the dataset to the output directory and run the following command to evaluate the rendering results. In the future, we will optimize the evaluation process. The path is the output directory of the rendering results.
 
 ```bash
