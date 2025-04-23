@@ -4,14 +4,6 @@
 
 ![Teaser image](assets/fig.png)
 
-<br>
-
-**April 7, 2024**: 
-* Initial release of the LEGaussians repository.
-
-</details>
-
-<br>
 
 
 ## Setup
