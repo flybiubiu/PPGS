@@ -40,8 +40,6 @@
 #echo Ct007960 | sudo -S  nvidia-settings --display :1.0 -a "[gpu:0]/GPUFanControlState=0"
 
 gpuid=0
-echo Ct007960 | sudo -S nvidia-settings --display :1.0 -a "[gpu:0]/GPUFanControlState=1" -a "[fan:0]/GPUTargetFanSpeed=99"
-#echo Ct007960 | sudo -S nvidia-settings --display :1.0 -a "[gpu:2]/GPUFanControlState=1" -a "[fan:2]/GPUTargetFanSpeed=99"
 name=room
 exper_name=${name}_semantic4_final_supp_noembedding
 #cd sam_encoder
@@ -70,5 +68,3 @@ cp -r /home/ps/Desktop/2t/fegs_data/Mip-NeRF360_Dataset/${name}/segmentations ./
 
 CUDA_VISIBLE_DEVICES=${gpuid} python eval.py --path output/mipnerf360/${name}/${exper_name}/open_new_eval_softmax_s10.0/
 
-echo Ct007960 | sudo -S  nvidia-settings --display :1.0 -a "[gpu:0]/GPUFanControlState=0"
-echo Ct007960 | sudo -S  nvidia-settings --display :1.0 -a "[gpu:1]/GPUFanControlState=0"
