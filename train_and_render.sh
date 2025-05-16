@@ -20,7 +20,6 @@
 #CUDA_VISIBLE_DEVICES=0 python eval.py --path output/mipnerf360/kitchen/0/open_new_eval_softmax_s10.0_a05/
 #CUDA_VISIBLE_DEVICES=0 python eval.py --path output/mipnerf360/room/0/open_new_eval_softmax_s10.0_a05/
 
-#echo Ct007960 | sudo -S nvidia-settings --display :1.0 -a "[gpu:0]/GPUFanControlState=1" -a "[fan:0]/GPUTargetFanSpeed=99"
 
 #cd sam_encoder
 #CUDA_VISIBLE_DEVICES=0 python export_image_embeddings.py --checkpoint checkpoints/sam_vit_h_4b8939.pth --model-type vit_h \
@@ -37,7 +36,6 @@
 #CUDA_VISIBLE_DEVICES=0 python render_mask.py --config configs/mipnerf360-rendering/kitchen.cfg
 #CUDA_VISIBLE_DEVICES=0 python eval.py --path output/mipnerf360/kitchen/0/open_new_eval_softmax_s10.0_a05/
 
-#echo Ct007960 | sudo -S  nvidia-settings --display :1.0 -a "[gpu:0]/GPUFanControlState=0"
 
 gpuid=0
 name=room
